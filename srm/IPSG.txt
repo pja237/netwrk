@@ -1,0 +1,17 @@
+!----------------------------------------
+! IP Source Guard
+! PVACL, untrusted & trunk ports only
+! prereq: DHCP snooping
+!----------------------------------------
+! per iface conf:
+ena
+conf t
+
+interface fa 0/0
+ip verify source ! ip source
+ip verify source port-security  ! ip and MAC source
+
+!----------------------------------------
+! debug
+!----------------------------------------
+show ip verify source

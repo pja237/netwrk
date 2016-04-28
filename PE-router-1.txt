@@ -1,0 +1,152 @@
+Current configuration : 2072 bytes
+!
+! Last configuration change at 23:15:29 UTC Thu Feb 4 2016
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$lyTj$iY6qDv1K3PJBSBf5I2oTy0
+!
+no aaa new-model
+no ip icmp rate-limit unreachable
+ip cef
+!
+ip vrf KORISNIK
+ rd 12345:1
+ route-target export 12345:1
+ route-target import 12345:1
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+no ipv6 cef
+!
+!
+mpls label range 100 200
+mpls label protocol ldp
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.0.10.1 255.255.255.255
+ ip ospf 1 area 10
+!
+interface FastEthernet0/0
+ ip address 192.168.0.1 255.255.255.0
+ speed auto
+ duplex auto
+ mpls ip
+!
+interface FastEthernet0/1
+ no ip address
+ shutdown
+ speed auto
+ duplex auto
+!
+interface GigabitEthernet1/0
+ ip vrf forwarding KORISNIK
+ ip address 10.0.1.1 255.255.255.0
+ negotiation auto
+!
+interface GigabitEthernet2/0
+ no ip address
+ shutdown
+ negotiation auto
+!
+!
+router eigrp 1
+ !
+ address-family ipv4 vrf KORISNIK autonomous-system 100
+  redistribute bgp 12345 metric 100000 10 255 1 1500
+  network 10.0.1.0 0.0.0.255
+ exit-address-family
+!
+router ospf 1
+ network 10.0.11.0 0.0.0.255 area 10
+ network 192.168.0.0 0.0.255.255 area 10
+!
+router bgp 12345
+ bgp log-neighbor-changes
+ neighbor 10.0.20.1 remote-as 12345
+ neighbor 10.0.20.1 update-source Loopback0
+ !
+ address-family vpnv4
+  neighbor 10.0.20.1 activate
+  neighbor 10.0.20.1 send-community both
+ exit-address-family
+ !
+ address-family ipv4 vrf KORISNIK
+  redistribute eigrp 100
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+banner motd ^C Welcome to R1 ^C
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ stopbits 1
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ password cisco
+ login
+line vty 5 15
+ password cisco
+ login
+!
+!
+end
+

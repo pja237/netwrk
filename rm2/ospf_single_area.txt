@@ -1,0 +1,26 @@
+! single area OSPF
+! - pja
+!
+! FROM: R(conf)#
+! ==============================
+! ospf must have: 
+! - ospf process
+! - participating interfaces
+! - area
+! - router id
+! ==============================
+! process: 1
+! ==============================
+router ospf 1
+! ==============================
+! 2 interfaces, area: 10
+! ==============================
+network 10.1.1.0 0.0.0.255 area 10
+network 10.2.2.0 0.0.0.255 area 10
+exit
+! ==============================
+! router id: (highest ip of loopback OR highest ip of first active if)
+! or manual: (not recommended)
+! router ospf
+! router-id ip-address
+

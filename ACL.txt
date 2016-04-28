@@ -1,0 +1,37 @@
+! ACL
+! - pja
+!
+! FROM: R(conf)#
+! =================================
+! deny access to router for 1 host
+! =================================
+!
+access-list 10 remark VTY_DENY
+access-list 10 deny host 10.1.1.100
+access-list 10 permit any
+!
+line vty 0 15
+access-class 10 in
+exit
+! =================================
+! Deny telnet anywhere for 1 host
+! =================================
+access-list 110 remark PROTECT_OTHER_SIDE
+access-list 110 deny tcp host 10.1.1.101 any eq telnet
+access-list 110 permit ip any any
+!
+interface FastEthernet0/0
+ip access-group 110 in
+exit
+! =================================
+! named ext. deny ftp to host
+! =================================
+ip access-list extended DENY_FTP_100
+deny tcp host 10.1.1.100 any eq ftp
+permit tcp any any
+exit
+!
+interface FastEthernet0/0
+ip access-group DENY_FTP_100 in
+exit
+! =================================

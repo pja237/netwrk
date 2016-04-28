@@ -1,0 +1,47 @@
+802.1x authentikacija konfiguracija by Jopy
+
+SW1#dot1x test eapol-capable interface fa 2/0/13
+#Ukljuèeno samo na interfaceu da je sposoban prenositi extended auth protocol over lan EAPOL, ako nema interfacea onda vrijedi za sve portove na switchu
+
+SW1(config)#dot1x test timeout 5
+#default je 10 sec, vrijeme koliko æe dugo switch èekati na odgovor od raèunala
+
+SW1(config)#aaa new model
+#Nakon ove naredbe više nemožemo koristiti starije protokole poput TACASA
+
+SW1(config)#dot1x system-auth-control
+#Globalno ukljuèujemo 802.1x autentikaciju
+
+SW1(config)#aaa authentication dot1x default group radius
+#Koristi æemo radius server
+
+SW1(config)#aaa accounting dot1x default start-stop group radius
+#accouting se radi na radius serveru
+
+SW1(config)#radius-server host 192.168.20.254 auth-port 1812 acct-port 1813 key class
+#Postavljamo radius server IP adresu, protove koje æemo koristiti za komunikaciju i key
+
+SW1(config)#aaa authorization network default group radius if-authenticated
+#Dopustit æe autorizaciju ako je korisnik authenticiran
+
+------------------------------------------------------------------------------------------
+Konfigiurcija porta prema raèunalu (SUPPLICANT-u)
+
+SW1(config)#interface fa 2/0/13 ili koje je veæ ukljuèeno
+SW1(config-if)#switchport mode access 
+SW1(config-if)#authentication port-control auto
+#Switch æe inicirati authenikaciju èim link aktivira periodièki dok se raèunalo ne autenticira
+SW1(config-if)#dot1x pae authenticator
+#Port postje "port access entity authenichator
+------------------------------------------------------------------------------------------
+Konfiguracija VLAN-ova za prebacivanje u odgovrajuæi vlan
+
+SW1(config-if)#authentication event fail action authorize vlan 13
+#Ako neproðe autentikacija raèunalo se stavlja u VLAN koji ima npr samo izlaz prema WAN-u
+
+SW1(config-if)#authentication timer reautenticate 30
+#Vrijeme u sekundama nakon kojega æe autentikacija biti ponovo inicijalizirana
+SW1(config-if)#dot1x timeout tx-period 30
+#Defaultno je 5 sek, to je vrijeme koje æe switch æeka EAP request/identity od raèunala, nakon toga izabaci poruku da je vrijeme isteklo
+SW1(config)#authentication mac-move permit
+#Omoguæava autenticiranom raèunalo da se premješta s jednog porta na drugi

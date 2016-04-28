@@ -1,0 +1,124 @@
+! BGP
+! - pja
+!
+! FROM: R(conf)#
+!
+! ==============================
+! setup:
+!
+!  R1--R2--Neighbor
+!
+! - R1-R2: iBGP AS 15
+! - R2-N: eBP AS 15 - 1111
+! - filter/change routes from N
+! ==============================
+!
+! R1
+! =========================================
+interface loopback 0
+ip address 10.1.0.1 255.255.255.0
+no shut
+exi
+
+interface loopback 1
+ip address 11.15.0.1 255.255.255.0
+no shut
+exi
+
+interface loopback 2
+ip address 11.15.1.1 255.255.255.0
+no shut
+exi
+
+interface loopback 3
+ip address 11.15.2.1 255.255.255.0
+no shut
+exi
+
+! BGP R1 - iBGP with R2
+! =========================================
+router bgp 15
+neighbor 10.1.1.1 remote-as 15
+neighbor 10.1.1.1 password pero123
+neighbor 10.1.1.1 update-source loopback 0
+exi
+! static route to R2 loopback interface via Serial link
+ip route 10.1.1.0 255.255.255.0 Serial 0/0/0
+! OR p2p static route
+! ip route 10.1.1.1 255.255.255.255 Serial 0/0/0
+router bgp 15
+network 11.15.0.0 mask 255.255.255.0
+network 11.15.1.0 mask 255.255.255.0
+network 11.15.2.0 mask 255.255.255.0
+exi
+
+! R2
+! =========================================
+interface loopback 0
+ip address 10.1.1.1 255.255.255.0
+no shut
+exi
+
+interface loopback 1
+ip address 22.15.0.1 255.255.255.0
+no shut
+exi
+
+interface loopback 2
+ip address 22.15.1.1 255.255.255.0
+no shut
+exi
+
+interface loopback 3
+ip address 22.15.2.1 255.255.255.0
+no shut
+exi
+
+interface loopback 10
+ip address 12.15.1.1 255.255.255.255
+no shut
+exi
+
+! BGP R2
+! =========================================
+
+! BGP R2 - iBGP with R1
+! =========================================
+router bgp 15
+neighbor 10.1.0.1 remote-as 15
+neighbor 10.1.0.1 password pero123
+neighbor 10.1.0.1 update-source loopback 0
+exi
+ip route 10.1.0.0 255.255.255.0 Serial 0/0/0
+
+router bgp 15
+network 22.15.0.0 mask 255.255.255.0
+network 22.15.1.0 mask 255.255.255.0
+network 22.15.2.0 mask 255.255.255.0
+exi
+
+! BGP R2 - eBGP with neighbor AS
+! =========================================
+router bgp 15
+neighbor 12.12.1.1 remote-as 1111
+neighbor 12.12.1.1 password pero123
+neighbor 12.12.1.1 update-source loopback 10
+neighbor 12.12.1.1 ebgp-multihop 2
+neighbor 12.12.1.1 route-map map_in in
+exi
+! static route to neighbor lo if via neighbor p2p link ip addr
+ip route 12.12.1.1 255.255.255.255 193.11.15.1
+
+! BGP ROUTE-MAP R2
+! =========================================
+! pick 2 routes from neighbor and "fix" them, leave rest unchanged
+! =========================================
+access-list 10 permit 11.11.0.0 255.255.255.0
+access-list 10 permit 11.11.1.0 255.255.255.0
+
+route-map map_in permit 10
+match ip address 10
+set local-preference 222
+
+route-map map_in permit 15
+

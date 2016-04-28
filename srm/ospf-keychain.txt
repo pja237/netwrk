@@ -1,0 +1,27 @@
+ena
+conf t
+!----------------------------------------
+! na oba podesiti keychain
+!----------------------------------------
+key chain R2-keys
+ key 1
+   key-string PASSWD1
+   accept-lifetime 00:00:00 Jan 1 2016 00:00:00 Jan 1 2017
+   send-lifetime 00:00:00 Jan 1 2016 00:00:00 Jan 1 2017
+end
+!----------------------------------------
+! router process
+!----------------------------------------
+conf t
+router ospf 1
+ area 0 authentication message-digest
+end
+!----------------------------------------
+! interface process
+!----------------------------------------
+conf t
+interface fa 0/0
+ ip ospf authentication message-digest
+ ip ospf message-digest-key 1 md5 pero123
+end
+!----------------------------------------

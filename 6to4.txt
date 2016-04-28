@@ -1,0 +1,5 @@
+https://supportforums.cisco.com/document/122121/ipv6-6to4-tunneling-configuration-example
+
+http://www.cisco.com/c/en/us/support/docs/ip/ip-version-6-ipv6/45741-6bone-tc-1.html
+
+http://blog.ine.com/2009/09/09/ipv6-transition-mechanisms-part-3-6to4-tunnels/

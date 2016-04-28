@@ -1,0 +1,25 @@
+! HSRP
+! - pja
+!
+! FROM: R#
+! ==============================
+! HSRP CONFIGURATION WITH TRACKING
+! ==============================
+!
+configure terminal
+interface fastEthernet 0/0
+ip address 10.0.0.10 255.255.255.0
+standby 1 ip 10.0.0.1
+standby 1 priority 110
+standby 1 preempt
+standby 1 timers msec 500 msec 1500
+!
+! track if fa0/1 with decrement value 20
+!
+standby 1 track fastEthernet 0/1 20
+standby 1 authentication pero123
+no shutdown
+exit
+exit
+show standby
+show track

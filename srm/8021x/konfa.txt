@@ -1,0 +1,249 @@
+Switch#sho run
+Building configuration...
+
+Current configuration : 5443 bytes
+!
+version 12.2
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname Switch
+!
+boot-start-marker
+boot-end-marker
+!
+enable secret 5 $1$UWOz$4shj8.PwQNqWhyIKCF6wf1
+!
+!
+!
+****aaa new-model
+!
+!
+****aaa authentication dot1x default group radius
+****aaa authorization network default group radius if-authenticated 
+****aaa accounting dot1x default start-stop group radius
+!
+!
+!
+aaa session-id common
+switch 1 provision ws-c3750v2-48ps
+system mtu routing 1500
+authentication mac-move permit
+***ip routing (ovo ukljuješ ako imas L3 switch) da možeš raditi ruting
+ izmeðu vlanova ili da možeš pingati server u konaènici
+!
+ip dhcp pool VLAN_10
+   network 172.16.10.0 255.255.255.0
+   default-router 172.16.10.1 
+   dns-server 8.8.8.8 
+!
+ip dhcp pool VLAN_20
+   network 10.10.20.0 255.255.255.0
+   default-router 10.10.20.1 
+   dns-server 8.8.8.8 
+!
+ip dhcp pool WAN
+   network 192.168.1.0 255.255.255.0
+   default-router 192.168.1.254 
+   dns-server 8.8.8.8 
+!
+ip dhcp pool VLAN_50
+   network 192.168.50.0 255.255.255.0
+   default-router 192.168.50.1 
+   dns-server 8.8.4.4 
+!
+!
+!
+!
+crypto pki trustpoint TP-self-signed-791403776
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-791403776
+ revocation-check none
+ rsakeypair TP-self-signed-791403776
+!
+!
+crypto pki certificate chain TP-self-signed-791403776
+ certificate self-signed 01
+  3082023D 308201A6 A0030201 02020101 300D0609 2A864886 F70D0101 04050030 
+  30312E30 2C060355 04031325 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 37393134 30333737 36301E17 0D393330 33303130 30303234 
+  375A170D 32303031 30313030 30303030 5A303031 2E302C06 03550403 1325494F 
+  532D5365 6C662D53 69676E65 642D4365 72746966 69636174 652D3739 31343033 
+  37373630 819F300D 06092A86 4886F70D 01010105 0003818D 00308189 02818100 
+  AC821470 6C883BDC A79F23B4 82B198D2 37B3EA53 C2C7FABF C6A1ADFE 1B5F4D74 
+  4F0A2678 70780100 2270E5E4 55E1CFE4 220BD73F DB90C410 314D5C33 4B274B86 
+  FDBEC26D 76264285 B0C6292E 35555488 109EBB5C D856363C 526F54C6 E4E24DA7 
+  0CEB2012 A62B6B7A 70639B81 F1313A28 34B98504 09DAC635 29F223AA F2421E6D 
+  02030100 01A36730 65300F06 03551D13 0101FF04 05300301 01FF3012 0603551D 
+  11040B30 09820753 77697463 682E301F 0603551D 23041830 16801447 B3ACC1AB 
+  78AF635C 0F91468B 995CD7D7 EA84C230 1D060355 1D0E0416 041447B3 ACC1AB78 
+  AF635C0F 91468B99 5CD7D7EA 84C2300D 06092A86 4886F70D 01010405 00038181 
+  00330E16 6D99742F 8D363443 EA7D35BA 28690FEC 82D0A6EC 9209C65F 7D655090 
+  1BC57E3B 0DFEA89F E4CF6099 BD19F146 D2163061 7D4EAE75 4CAADDDC 8E4214E6 
+  A47EA186 1C24B8B3 DEDED6E9 2BACCCC5 5CA1D6F6 D23E537A 81F66922 D1B22A69 
+  286F6623 9E6A8EA7 45115C84 1C6FB7B4 58C97233 06EC039C 4543C1E1 1CB13CAF F4
+  quit
+****dot1x system-auth-control
+****dot1x test timeout 5
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!         
+vlan internal allocation policy ascending
+!
+!
+!
+!
+interface FastEthernet1/0/1
+!
+interface FastEthernet1/0/2
+!
+interface FastEthernet1/0/3
+!
+interface FastEthernet1/0/4
+!
+interface FastEthernet1/0/5
+!
+interface FastEthernet1/0/6
+!
+interface FastEthernet1/0/7
+!
+interface FastEthernet1/0/8
+!
+interface FastEthernet1/0/9
+!         
+interface FastEthernet1/0/10
+!
+interface FastEthernet1/0/11
+!
+interface FastEthernet1/0/12
+!
+interface FastEthernet1/0/13
+!
+interface FastEthernet1/0/14
+!
+****interface FastEthernet1/0/15
+**** switchport mode access
+**** authentication event fail action authorize vlan 1000
+**** authentication port-control auto
+**** authentication timer reauthenticate 10
+**** dot1x pae authenticator
+**** dot1x timeout tx-period 15
+!
+interface FastEthernet1/0/16
+!
+interface FastEthernet1/0/17
+!
+interface FastEthernet1/0/18
+!
+interface FastEthernet1/0/19
+!
+interface FastEthernet1/0/20
+!
+interface FastEthernet1/0/21
+!
+interface FastEthernet1/0/22
+!
+****interface FastEthernet1/0/23
+**** switchport mode access
+****authentication port-control auto
+**** dot1x pae authenticator
+!
+interface FastEthernet1/0/24
+!
+interface FastEthernet1/0/25
+!
+interface FastEthernet1/0/26
+!
+interface FastEthernet1/0/27
+!
+interface FastEthernet1/0/28
+!
+interface FastEthernet1/0/29
+ switchport mode access
+ authentication event fail action authorize vlan 1000
+ authentication port-control auto
+ authentication timer reauthenticate 10
+ dot1x pae authenticator
+ dot1x timeout tx-period 15
+!
+interface FastEthernet1/0/30
+!
+interface FastEthernet1/0/31
+!
+interface FastEthernet1/0/32
+!
+interface FastEthernet1/0/33
+!
+interface FastEthernet1/0/34
+!
+interface FastEthernet1/0/35
+!
+interface FastEthernet1/0/36
+!         
+interface FastEthernet1/0/37
+!
+interface FastEthernet1/0/38
+!
+interface FastEthernet1/0/39
+!
+interface FastEthernet1/0/40
+!
+interface FastEthernet1/0/41
+!
+interface FastEthernet1/0/42
+!
+interface FastEthernet1/0/43
+!
+interface FastEthernet1/0/44
+!
+interface FastEthernet1/0/45
+!
+interface FastEthernet1/0/46
+!
+interface FastEthernet1/0/47
+!
+interface FastEthernet1/0/48
+!
+interface GigabitEthernet1/0/1
+!
+interface GigabitEthernet1/0/2
+!
+interface GigabitEthernet1/0/3
+!
+interface GigabitEthernet1/0/4
+!
+interface Vlan1
+ ip address 192.168.20.1 255.255.255.0
+!
+interface Vlan10
+ ip address 172.16.10.1 255.255.255.0
+!
+interface Vlan20
+ ip address 10.10.20.1 255.255.255.0
+!
+interface Vlan50
+ ip address 192.168.50.1 255.255.255.0
+!
+interface Vlan1000
+ ip address 192.168.1.254 255.255.255.0
+!
+ip classless
+ip http server
+ip http secure-server
+!
+!
+!
+radius-server host 192.168.20.200 auth-port 1812 acct-port 1813 key class
+!
+!
+line con 0
+ password cisco
+ logging synchronous
+line vty 5 15
+!
+end

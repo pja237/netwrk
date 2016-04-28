@@ -1,0 +1,17 @@
+interface FastEthernet0/1
+ switchport mode access
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security violation shutdown
+ switchport port-security mac-address sticky 
+ switchport port-security mac-address sticky 000C.8513.4401
+ switchport port-security mac-address sticky 0060.478C.090E
+
+! err-disabled recovery
+conf t
+! pali err-disable za sve razloge
+!errdisable detect cause all
+!errdisable recovery cause psec-violation
+!errdisable recovery interval 600
+end
+show errdisable recovery

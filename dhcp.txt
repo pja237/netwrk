@@ -1,0 +1,27 @@
+! DHCP 
+! - pja
+!
+! FROM: R(conf)#
+! ==============================
+service dhcp
+ip dhcp excluded-address 10.1.1.1 10.1.1.99
+ip dhcp excluded-address 10.1.1.200 10.1.1.254
+ip dhcp excluded-address 10.2.2.1 10.2.2.99
+ip dhcp excluded-address 10.2.2.200 10.2.2.254
+! ==============================
+! Networks are matched _automatically_ to interfaces by IP addr.
+!  e.g. below: 
+!    - one router interface has a 10.1.1.1/24 network address, other has 10.2.2.1/24
+! ==============================
+ip dhcp pool TEN_ONE
+ network 10.1.1.0 255.255.255.0
+ default-router 10.1.1.1
+! ...add dhcp options here...
+exit
+! ==============================
+ip dhcp pool TEN_TWO
+ network 10.2.2.0 255.255.255.0
+ default-router 10.2.2.1
+! ...add dhcp options here...
+exit
+!

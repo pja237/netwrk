@@ -1,0 +1,32 @@
+! BASIC ROUTER CONFIGURATION
+! - pja
+!
+! FROM: R>
+! ==============================
+! basics
+! ==============================
+enable
+clock set 00:00:00 1 Apr 2016
+conf t
+hostname R2
+no ip domain-lookup
+banner X Welcome to R2 X
+service password-encryption
+enable secret class
+! ==============================
+! virtual terminal (telnet )security
+! ==============================
+line vty 0 15
+password vspr
+login
+exit
+! ==============================
+! console security + logging
+! ==============================
+line console 0
+password cisco
+login
+logging synchronous
+exit
+!
+

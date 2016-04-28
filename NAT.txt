@@ -1,0 +1,41 @@
+! NAT
+! - pja
+!
+! FROM: R(conf)#
+!
+! ==============================
+! to do: 
+!  1. define inside/outside intefaces
+!  2. choose: static / dynamic [pat]
+! 
+! 1. inside/outside
+interface FastEthernet 0/0
+ip nat inside
+exit
+interface FastEthernet 0/1
+ip nat outside 
+exit
+!
+! ==============================
+! STATIC 1:1
+! ==============================
+ip nat inside source static 10.1.1.101 10.2.2.1 
+! ==============================
+! DYNAMIC n:n
+! ==============================
+! ip nat pool NAT_POOL 10.2.2.1 10.2.2.10 255.255.255.0
+ip access-list standard TO_NAT
+permit 10.1.1.0 0.0.0.255
+exi
+! ip nat inside source list TO_NAT pool NAT_POOL
+ip nat inside source list TO_NAT interface FastEthernet 0/1
+! ==============================
+! DYN+PAT n:m (n>m, m>=1) 
+! ==============================
+!ip nat pool NAT_POOL 10.2.2.1 10.2.2.10 255.255.255.0
+ip access-list standard TO_NAT
+permit 10.1.1.0 0.0.0.255
+exi
+!ip nat inside source list TO_NAT pool NAT_POOL overload
+ip nat inside source list TO_NAT interface FastEthernet 0/1 overload
+!

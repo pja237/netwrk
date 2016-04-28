@@ -1,0 +1,42 @@
+ena
+conf t
+!
+!----------------------------------------
+! EIGRP
+!----------------------------------------
+router eigrp 1
+ redistribute rip metric 100000 0 255 1 1500 
+! redistribucija default rute
+ redistribute static metric 100000 10 255 1 1500 
+ network 172.16.3.0 0.0.0.255
+ network 172.16.2.0 0.0.0.255
+! automatska sumarizacija na granicama klasa
+! u ruting tablici postoje Null0 rute (odbacivanje paketa ako ne postoji child ultimativna ruta)
+ no auto-summary
+! maximum path X ! x same-metric load balancing ruta
+! variance 2 ! var=1 == equal cost load balance, 2 = umnozak (koliko losija metrika ulazi u load-balance)
+ exit
+!----------------------------------------
+! ostalo: bandwidth, delay, sumarizacija
+!----------------------------------------
+!interface x y/z
+!bandwidth A
+!delay B
+!ip hello-interval eigrp 1 10
+!ip hold-interval eigrp 1 60
+!ip summary address eigrp 1 a.a.a.a n.n.n.n
+!----------------------------------------
+!
+!----------------------------------------
+! RIP
+!----------------------------------------
+router rip
+ version 2
+ redistribute eigrp 1 metric 5 
+ network 8.0.0.0
+ network 172.16.0.0
+! ne saljemo updates na ovaj interface (recimo fa0/0==8.0.0.0) ALI je oglasavamo
+! passive-interface fa 0/0
+ no auto-summary
+ exit
+!

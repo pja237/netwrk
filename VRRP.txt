@@ -1,0 +1,27 @@
+! VRRP
+! - pja
+!
+! FROM: R#
+! ==============================
+! VRRP CONFIGURATION WITH TRACKING
+! ==============================
+!
+configure terminal
+!
+! set up track object no.1
+!
+track 1 interface fastEthernet 0/0 line-protocol
+exit
+!
+interface fastEthernet 0/1
+ip address 192.168.0.10 255.255.255.0
+vrrp 1 ip 192.168.0.1
+vrrp 1 priority 110
+vrrp 1 preempt
+vrrp 1 track 1 decrement 20
+vrrp 1 authentication text pero321
+no shutdown
+exit
+exit
+show vrrp
+show track

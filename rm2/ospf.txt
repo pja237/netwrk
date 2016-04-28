@@ -1,0 +1,101 @@
+OSPF NOTES
+
+A cost is associated with the output side of each router
+interface. This cost is configurable by the system
+administrator. The lower the cost, the more likely the
+interface is to be used to forward data traffic.
+
+When no OSPF areas are configured, each router in the Autonomous
+System has an identical link-state database, leading to an
+identical graphical representation. A router generates its
+routing table from this graph by calculating a tree of shortest
+paths with the router itself as root.
+
+After the tree is created the external routing information is
+examined. This external routing information may originate from
+another routing protocol such as BGP, or be statically
+configured (static routes). Default routes can also be included
+as part of the Autonomous System’s external routing information.
+External routing information is flooded unaltered throughout the
+AS.
+
+OSPF supports two types of external metrics. 
+Type 1 external metrics are expressed in the same units as OSPF interface cost.
+Type 2 external metrics are an order of magnitude larger; any Type 2 metric is
+considered greater than the cost of any path internal to the AS.
+Use of Type 2 external metrics assumes that routing between
+AS’es is the major cost of routing a packet, and eliminates the
+need for conversion of external costs to internal link state
+metrics.
+
+Looking at this another way, inter-area routing can be pictured
+as forcing a star configuration on the Autonomous System, with
+the backbone as hub and each of the non-backbone areas as
+spokes.
+
+The correct area border router to use as the packet exits the
+source area is chosen in exactly the same way routers
+advertising external routes are chosen. Each area border router
+in an area summarizes for the area its cost to all networks
+external to the area. After the SPF tree is calculated for the
+area, routes to all inter-area destinations are calculated by
+examining the summaries of the area border routers.
+
+An OSPF AS-external-LSA is usually flooded throughout the entire AS. 
+However, OSPF allows certain areas to be configured as "stub areas". 
+AS-external-LSAs are not flooded into/throughout stub areas;
+routing to AS external destinations in these areas is based on a
+(per-area) default only.
+
+One or more of the stub area’s area border routers must advertise a
+default route into the stub area via summary-LSAs. 
+These summary defaults are flooded throughout the stub area, but no further.
+
+OSPF creates adjacencies between neighboring routers for the purpose
+of exchanging routing information. Not every two neighboring
+routers will become adjacent.
+
+The Designated Router is elected by the Hello Protocol. A
+router’s Hello Packet contains its Router Priority, which is
+configurable on a per-interface basis. In general, when a
+router’s interface to a network first becomes functional, it
+checks to see whether there is currently a Designated Router for
+the network. If there is, it accepts that Designated Router,
+regardless of its Router Priority. (This makes it harder to
+predict the identity of the Designated Router, but ensures that
+the Designated Router changes less often. See below.)
+Otherwise, the router itself becomes Designated Router if it has
+the highest Router Priority on the network.
+
+The Designated Router is the endpoint of many adjacencies. In
+order to optimize the flooding procedure on broadcast networks,
+the Designated Router multicasts its Link State Update Packets
+to the address AllSPFRouters, rather than sending separate
+packets over each adjacency.
+
+INTERFACE RELATED DATA: 
+-----------------------
+HelloInterval
+The length of time, in seconds, between the Hello packets that
+the router sends on the interface. Advertised in Hello packets
+sent out this interface.
+
+RouterDeadInterval
+The number of seconds before the router’s neighbors will declare
+it down, when they stop hearing the router’s Hello Packets.
+Advertised in Hello packets sent out this interface.
+
+Router Priority
+An 8-bit unsigned integer. When two routers attached to a
+network both attempt to become Designated Router, the one with
+the highest Router Priority takes precedence. A router whose
+Router Priority is set to 0 is ineligible to become Designated
+Router on the attached network. Advertised in Hello packets
+sent out this interface.
+
+Interface output cost(s)
+The cost of sending a data packet on the interface, expressed in
+the link state metric. This is advertised as the link cost for
+this interface in the router-LSA. The cost of an interface must
+be greater than zero.
+

@@ -1,0 +1,20 @@
+!----------------------------------------
+! DAI
+! prereq: dhcp snooping
+! from >
+!----------------------------------------
+ena
+conf t
+!----------------------------------------
+! global conf
+!----------------------------------------
+ip dhcp snooping vlan X
+ip arp inspection vlan X
+
+!----------------------------------------
+! per port
+!----------------------------------------
+interface fa 0/1
+! config trusted porta
+ip dhcp snooping trust
+ip arp inspection trust

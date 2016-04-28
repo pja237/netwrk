@@ -1,0 +1,9 @@
+!========================================
+! OSPF PLAIN TEXT AUTH
+!========================================
+!----------------------------------------
+!interface fa 0/0
+!----------------------------------------
+ ip ospf authentication
+! 8 char pass, truncated
+ ip ospf authentication-key PASSWORD

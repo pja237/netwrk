@@ -1,0 +1,79 @@
+! SETUP:
+!  - provider mreza (sumarizirano na 192.168/16)
+!  - customer mreza (sum: 10/8)
+!
+! (xCE)--(xPE)-- 192.168.0/24 --(xP)-- 192.168.1/24 --(xP)-- 192.168.2/24 --(xPE)--(xCE)
+!
+!==============================
+! 1. IGP unutar provider mreze
+!==============================
+! e.g. ospf
+! na svim ruterima:
+conf t
+router ospf 1
+network 192.168.0.0 0.0.255.255 area 10
+end
+!
+!==============================
+! 2. MPLS unutar provider mreze
+!==============================
+! na svim ruterima (na mreznim suceljima gdje se vrti MPLS):
+conf t
+mpls ldp router-id loopback 0 force
+! e.g. int fa 0/0
+mpls ip
+exi
+!
+! TEST: show mpls ldp neighbor
+! TEST: show mpls forwarding-table
+!
+!==============================
+! 1. setup VRF table @PE
+!==============================
+conf t
+ip vrf korisnik
+! set route-distinguisher (ASN:nn || IP:nn)
+rd 999:1
+! set route-target
+route-target both 999:11
+end
+!
+!==============================
+! 2. join interface with VRF table:
+!==============================
+conf t
+! e.g. int fa 0/0
+ip vrf forwarding korisnik
+ip address 10.1.1.3 255.255.255.0
+!
+! TEST: show ip vrf
+!
+!==============================
+! 3. start P-C IGP (EIGRP) and assign it to VRF
+!==============================
+conf t
+router eigrp 100 ! "top" ASn
+address-family ipv4 vrf korisnik autonomous-system 1 ! assign AS 1 (P-C) to vrf korisnik
+no auto-summary
+network 10.1.1.0 0.0.0.255 ! P-C network if
+end
+!
+! TEST: show ip route vrf korisnik
+! TEST: ping vrf korisnik 10.99.98.1 ! C-loopback
+! TEST: ping vrf korisnik 10.1.1.5   ! C-P link
+!
+!==============================
+! 4. SETUP iBGP between PE1-PE2
+!==============================
+conf t
+router bgp 65536
+neighbor 192.168.0.3 remote-as 65536
+! neighbor 192.168.0.3 update-source loopback 0
+address-family vpnv4
+neighbor 192.168.2.4 activate
+neighbor 192.168.2.4 send-community both
+exit-address-family
+!
+address-family ipv4 vrf korisnik
+redistribute eigrp 1
+exit-address-family
