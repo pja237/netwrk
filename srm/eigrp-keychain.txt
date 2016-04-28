@@ -1,0 +1,19 @@
+ena
+conf t
+!----------------------------------------
+! na oba podesiti keychain
+!----------------------------------------
+key chain R2-keys
+ key 1
+   key-string PASSWD1
+   accept-lifetime 00:00:00 Jan 1 2016 00:00:00 Jan 1 2017
+   send-lifetime 00:00:00 Jan 1 2016 00:00:00 Jan 1 2017
+! cryptographic-algorithm hmac-sha-256
+end
+!
+conf t
+
+router eigrp 11
+! network...
+ ip authentication mode eigrp 11 md5
+ ip authentication key-chain eigrp 11 PASSWD1

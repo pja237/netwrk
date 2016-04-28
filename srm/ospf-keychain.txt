@@ -8,12 +8,16 @@ key chain R2-keys
    key-string PASSWD1
    accept-lifetime 00:00:00 Jan 1 2016 00:00:00 Jan 1 2017
    send-lifetime 00:00:00 Jan 1 2016 00:00:00 Jan 1 2017
+! cryptographic-algorithm hmac-sha-256
 end
 !----------------------------------------
 ! router process
 !----------------------------------------
 conf t
 router ospf 1
+! network x.x.x.x x.x.x.x
+! network y.y.y.y y.y.y.y
+!palimo za sve network procese
  area 0 authentication message-digest
 end
 !----------------------------------------
@@ -22,6 +26,9 @@ end
 conf t
 interface fa 0/0
  ip ospf authentication message-digest
+! KEY
  ip ospf message-digest-key 1 md5 pero123
+! ILI:
+!ip ospf authentication key-chain PASSWD1
 end
 !----------------------------------------
