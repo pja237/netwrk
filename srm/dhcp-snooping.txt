@@ -9,6 +9,8 @@ conf t
 !----------------------------------------
 ip dhcp snooping
 ip dhcp snooping vlan 1
+! persistent snooping db:
+!ip dhcp snooping database flash:snoop.db
 
 !----------------------------------------
 ! trusted port
@@ -27,7 +29,7 @@ no ip dhcp snooping trust
 ! opcija 82: na switchu
 !----------------------------------------
 ! interface vlan 1 
-! ip helper-address 10.0.0.2
+! ip helper-address 10.0.0.2 ! dhcp server address
 
 
 !----------------------------------------

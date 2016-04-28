@@ -1,0 +1,32 @@
+! http://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst4000/8-2glx/configuration/guide/stp_enha.html
+
+!----------------------------------------
+!  BPDU GUARD 
+!	- disable portfast port if receive BPDU
+!----------------------------------------
+! config-if
+spanning-tree bpduguard enable
+
+!----------------------------------------
+!  BPDU FILTER
+!	- do not send BPDU on port
+!----------------------------------------
+! config - globalno, za sve portfast porteve
+! config-if - per port
+
+!----------------------------------------
+!  ROOT GUARD
+!	- prevent rogue sw from becoming root
+!	- access, if better bpdu received, kill port (listen)
+!----------------------------------------
+! config if
+spanning-tree guard root
+
+!----------------------------------------
+!  LOOP GUARD
+!	- prevent alt. port from becoming designated
+!----------------------------------------
+! config - global
+spanning-tree loopguard default
+! config-if - per port
+spanning-tree guard loop

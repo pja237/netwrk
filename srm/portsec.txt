@@ -15,3 +15,9 @@ conf t
 !errdisable recovery interval 600
 end
 show errdisable recovery
+
+!----------------------------------------
+! DEBUG
+!----------------------------------------
+show port-security
+show port-security interface fa 0/1

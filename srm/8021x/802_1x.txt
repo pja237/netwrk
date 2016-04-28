@@ -1,0 +1,76 @@
+!----------------------------------------
+! from #
+!----------------------------------------
+conf t
+!----------------------------------------
+! AVOID LOCKOUT - aaa new-model applies to all
+!----------------------------------------
+username xxx password yyy 
+!----------------------------------------
+! ?
+!----------------------------------------
+! iface prema supplicantu 
+dot1x test eapol-capable interface fa 2/0/13
+! global, prema svima
+!dot1x test eapol-capable 
+! default: 10
+dot1x test timeout 5
+!----------------------------------------
+
+!========================================
+! AAA
+!========================================
+aaa new-model
+dot1x system-auth-control
+aaa authentication dot1x default group radius
+aaa accounting dot1x default start-stop group radius
+!----------------------------------------
+! RADUIS SERVER CONFIG
+!----------------------------------------
+radius-server host 192.168.20.254 auth-port 1812 acct-port 1813 key class
+!----------------------------------------
+aaa authorization network default group radius if-authenticated
+
+!========================================
+! iface prema supplicantu *
+!========================================
+interface fa 2/0/13 
+ switchport mode access 
+ authentication port-control auto
+ dot1x pae authenticator
+!----------------------------------------
+! EVENT FAIL *
+!----------------------------------------
+ authentication event fail action authorize vlan 13
+!----------------------------------------
+! optional ?*
+!----------------------------------------
+ authentication timer reauthenticate 30
+ dot1x timeout tx-period 30
+ authentication mac-move permit
+
+!----------------------------------------
+! optional
+!----------------------------------------
+ authentication host-mode multi-host
+ authentication host-mode multi-domain ! (comp & voip on port)
+ authentication violation restrict ! (P-R-S)
+ authentication violation replace ! (MAC cleanup, da se novi comp moze autentificirati)
+
+!========================================
+! EQUIP. MGMT.
+!========================================
+aaa group server radius RAD
+ server 10.0.0.1 auth-port 1812 acct-port 1812 key class
+ exi
+!----------------------------------------
+aaa authentication login default group radius local
+aaa authorization exec default group radius if-authenticated
+aaa accounting dot1x default start-stop group radius
+radius-server host 10.0.0.1 auth-port 1812 acct-port 1812 key class
+!----------------------------------------
+crypto key generate rsa general-keys modulus 1024
+line vty 0 15
+ transport input ssh 
+ login authentication RAD
+!----------------------------------------

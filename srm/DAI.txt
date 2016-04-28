@@ -10,6 +10,7 @@ conf t
 !----------------------------------------
 ip dhcp snooping vlan X
 ip arp inspection vlan X
+! ...i upaliti untrusted/trusted portove
 
 !----------------------------------------
 ! per port

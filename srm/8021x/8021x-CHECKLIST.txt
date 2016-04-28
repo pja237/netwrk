@@ -1,0 +1,21 @@
+RADIUS Configuration Task List
+
+To configure RADIUS on your Cisco router or access server, you must perform the following tasks:
+
+•Use the aaa new-model global configuration command to enable AAA. AAA must be configured if you plan to use RADIUS. For more information about using the aaa new-model command, refer to the "AAA Overview" chapter.
+
+•Use the aaa authentication global configuration command to define method lists for RADIUS authentication. For more information about using the aaa authentication command, refer to the "Configuring Authentication" chapter.
+
+•Use line and interface commands to enable the defined method lists to be used. For more information, refer to the "Configuring Authentication" chapter.
+
+The following configuration tasks are optional:
+
+•You may use the aaa group server command to group selected RADIUS hosts for specific services. For more information about using the aaa group server command, refer to the "Configuring AAA Server Groups" section in this chapter.
+
+•You may use the aaa dnis map command to select RADIUS server groups based on DNIS number. To use this command, you must define RADIUS server groups using the aaa group server command. For more information about using the aaa dnis map command, refer to the section "Configuring AAA Server Group Selection Based on DNIS" in this chapter.
+
+•You may use the aaa authorization global command to authorize specific user functions. For more information about using the aaa authorization command, refer to the chapter "Configuring Authorization."
+
+•You may use the aaa accounting command to enable accounting for RADIUS connections. For more information about using the aaa accounting command, refer to the chapter "Configuring Accounting."
+
+•You may use the dialer aaa interface configuration command to create remote site profiles that contain outgoing call attributes on the AAA server. For more information about using the dialer aaa command, refer to the section "Configuring Suffix and Password in RADIUS Access Requests" in this chapter.
