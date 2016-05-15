@@ -30,3 +30,13 @@ logging synchronous
 exit
 !
 
+! ==============================
+! SSH
+! ==============================
+!ip domain domainname.lan
+!crypto key generate rsa
+!username pero secret pero123
+!ip ssh version 2
+!line vty 0 15
+! transport ssh
+! end
