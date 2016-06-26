@@ -1,0 +1,46 @@
+! IPSEC
+!
+ena
+conf t
+!
+! 1. enable ISAKMP
+crypto isakmp enable
+
+!
+! 2. configure ISAKMP policy
+crypto isakmp policy 1
+	authentication pre-share
+	group 24
+	encryption aes 256
+	hash sha512
+	lifetime 120
+	exi
+
+!
+! 3. set ISAKMP identity (opt.)
+crypto isakmp identity address
+!
+! if using PSK, define it
+crypto isakmp key pero123 address 10.0.0.2
+
+!
+! 4. define TRANSFORM SETS (for SAs)
+
+crypto ipsec transform-set VJEZBA esp-sha512-hmac esp-aes 256
+	mode tunnel
+	exi
+
+!
+! 5. define CRYPTO MAP
+access-list 100 permit ip host 8.8.8.8 host 9.9.9.9
+crypto map MAPAZAVJEZBU 1 ipsec-isakmp
+	set peer 10.0.0.2
+	set transform-set VJEZBA
+	set security-association lifetime seconds 900
+	match address 100
+
+!
+! 6. APPLY crypto map on outgoing interface
+! e.g. gi 1/0
+! interface gi 1/0
+crypto map MAPAZAVJEZBU
