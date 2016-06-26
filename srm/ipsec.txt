@@ -33,11 +33,22 @@ crypto ipsec transform-set VJEZBA esp-sha512-hmac esp-aes 256
 !
 ! 5. define CRYPTO MAP
 access-list 100 permit ip host 8.8.8.8 host 9.9.9.9
+
+! e.g. tunnel gre over ipsec
+!ip access-list extended ipsec1-3
+! permit gre host 10.0.0.1 host 10.0.0.3
+
 crypto map MAPAZAVJEZBU 1 ipsec-isakmp
 	set peer 10.0.0.2
 	set transform-set VJEZBA
 	set security-association lifetime seconds 900
 	match address 100
+! for multiple vpn endpoints, keep on adding to the same map (two maps CAN NOT be applied on the same interface!?)
+!crypto map MAPAZAVJEZBU 2 ipsec-isakmp
+!	set peer 10.0.0.3
+!	set transform-set VJEZBA2
+!	set security-association lifetime seconds 900
+!	match address 200
 
 !
 ! 6. APPLY crypto map on outgoing interface
