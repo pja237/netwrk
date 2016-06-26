@@ -1,0 +1,17 @@
+!
+!                 .1   .1                 .2    .2
+! 172.16.0.0/24 ---( X )--- 10.0.0.0/24 ---( X )--- 172.16.1.0/24
+!                    |                       |
+!                    \ Tunnel 192.168.1.0/24 /
+!                     .1                   .2
+
+! @ R1
+interface Tunnel0
+ ip address 192.168.1.1 255.255.255.0
+ tunnel source 10.0.0.1
+ tunnel destination 10.0.0.2
+
+! @ R1
+ip route 172.16.1.0 255.255.255.0 192.168.1.2
+
+! ponoviti na R2 s adekvatnim podatcima
