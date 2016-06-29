@@ -39,4 +39,5 @@ exit
 !ip ssh version 2
 !line vty 0 15
 ! transport ssh
+! login local
 ! end
