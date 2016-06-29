@@ -1,0 +1,6 @@
+snmp-server community prtgRO RO
+!snmp-server community prtgRW RW
+snmp-server trap-source FastEthernet0/0
+snmp-server enable traps
+snmp-server host 192.168.3.254 version 2c prtgRO
+
