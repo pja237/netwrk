@@ -1,0 +1,165 @@
+
+!
+! Last configuration change at 13:40:42 UTC Thu Jun 30 2016
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+no ip icmp rate-limit unreachable
+ip cef
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+no ipv6 cef
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+crypto isakmp policy 1
+ encr aes 256
+ hash sha512
+ authentication pre-share
+ group 24
+ lifetime 120
+crypto isakmp key pero123 address 201.55.196.222 
+!
+!
+crypto ipsec transform-set TSvjezba esp-aes 256 esp-sha512-hmac 
+ mode tunnel
+!
+!
+!
+crypto map MAPvjezba 1 ipsec-isakmp 
+ description GRE OVER IPSEC TO R3
+ set peer 201.55.196.222
+ set transform-set TSvjezba 
+ match address GRE2IPSEC
+crypto map MAPvjezba 2 ipsec-isakmp 
+ description plain ipsec between lo10-lo10
+ set peer 201.55.196.222
+ set transform-set TSvjezba 
+ match address lo2IPSEC
+crypto map MAPvjezba 3 ipsec-isakmp 
+ description subnet 11 - IPSEC to 13
+ set peer 201.55.196.222
+ set transform-set TSvjezba 
+ match address lo112IPSEC
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 172.16.0.1 255.255.0.0
+!
+interface Loopback1
+ ip address 172.17.0.1 255.255.0.0
+!
+interface Loopback10
+ ip address 10.1.1.1 255.255.255.0
+!
+interface Loopback11
+ ip address 10.11.11.12 255.255.255.0 secondary
+ ip address 10.11.11.11 255.255.255.0
+!
+interface Tunnel0
+ ip address 192.168.10.101 255.255.255.252
+ tunnel source GigabitEthernet1/0
+ tunnel destination 201.55.196.222
+!
+interface FastEthernet0/0
+ ip address 192.168.3.101 255.255.255.0
+ speed auto
+ duplex auto
+!
+interface FastEthernet0/1
+ no ip address
+ shutdown
+ speed auto
+ duplex auto
+!
+interface GigabitEthernet1/0
+ ip address 193.85.97.122 255.255.255.252
+ negotiation auto
+ crypto map MAPvjezba
+!
+interface GigabitEthernet2/0
+ no ip address
+ shutdown
+ negotiation auto
+!
+!
+router eigrp 1
+ network 193.85.97.120 0.0.0.3
+!
+router ospf 1
+ network 172.16.0.0 0.0.255.255 area 0
+ network 172.17.0.0 0.0.255.255 area 0
+ network 192.168.10.100 0.0.0.3 area 0
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip route 10.3.3.0 255.255.255.0 193.85.97.121
+ip route 10.13.13.0 255.255.255.0 193.85.97.121
+!
+ip access-list extended GRE2IPSEC
+ permit gre host 193.85.97.122 host 201.55.196.222
+ip access-list extended lo112IPSEC
+ deny   icmp host 10.11.11.12 host 10.13.13.14
+ deny   ip host 10.11.11.12 host 10.13.13.14
+ permit ip 10.11.11.0 0.0.0.255 10.13.13.0 0.0.0.255
+ip access-list extended lo2IPSEC
+ permit ip host 10.1.1.1 host 10.3.3.3
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ login
+!
+!
+end
