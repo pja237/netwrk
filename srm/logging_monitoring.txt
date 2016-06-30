@@ -1,0 +1,45 @@
+! conf t
+! logging ?
+! logging host x.x.x.x
+! logging trap 7
+!
+! FTP user/pass
+! conf t
+! ip ftp username xxx
+! ip ftp password yyy
+! copy running-config ftp://x.x.x.x/run
+!
+! periodic:
+!
+! conf t
+! archive 
+! path ftp://x.x.x.x/$h-config
+! time-period y
+! wire-memory
+!
+! debug: show archive
+! rollback:
+! configure replace ftp://x.x.x.x/conf [list]
+!
+! monitor:
+! SPAN
+! monitor session 1 source interface fa 1/1
+! monitor session 1 destination interface fa 1/1
+! show monitor
+!
+! RSPAN
+!
+! @S1
+! vlan 100
+!  name RSPAN-vlan
+!  remote-span
+! monitor session 2 source interface fa 1/1
+! monitor session 2 destination remote RSPAN-vlan
+!
+! @S2
+! vlan 100
+!  name RSPAN-vlan
+!  remote-span
+! monitor session 2 source remote RSPAN-vlan
+! monitor session 2 destination interface fa 1/8
+! 
