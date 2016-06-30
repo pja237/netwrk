@@ -43,3 +43,14 @@
 ! monitor session 2 source remote RSPAN-vlan
 ! monitor session 2 destination interface fa 1/8
 ! 
+! NETFLOW
+! conf t
+! int fa 0/1
+!  ip flow ingress
+!  ip flow egress
+!  exi
+! ip flow-export ?
+! ip flow-export source fa 0/0
+! ip flow-export ver 9
+! ip flow-export destination x.x.x.x [port]
+! 
