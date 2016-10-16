@@ -1,0 +1,78 @@
+! eBGP
+! - pja
+!
+! FROM: R#
+! ==============================
+! BGP CONFIGURATION
+! ==============================
+!
+! neighbor table:
+!  show ip bgp summary
+! BGP table:
+!  show ip bgp
+! running-config
+!  show run | section router
+!
+! ==============================
+! eBGP
+! ==============================
+!
+! loopback interface za oglasavanje ruta
+!
+conf t
+interface loopback 10
+ip address 10.10.1.1 255.255.255.0
+exi
+!
+! staticka ruta do susjednog lo if
+!
+ip route 10.10.2.2 255.255.255.255 172.16.0.2
+!
+! eBGP
+!
+router bp 65536
+neighbor 10.10.2.2 remote-as 65537
+neighbor 10.10.2.2 update-source loopback 10
+neighbor 10.10.2.2 ebgp-multihop 2
+! ADVERTISED NETWORKS via eBGP, default: NONE !!!
+network 10.0.0.0 mask 255.255.255.0
+exi
+!
+! redistribute BGP into OSPF
+!
+! router ospf 1
+! redistribute bgp 65536 subnets
+!
+! redistribute BGP into EIGRP
+!
+! router eigrp 1 
+! redistribute bgp 65537 metric 100000 1 255 1 1500
+!
+!
+! DISTRIBUTION LIST FILTER - INCOMING ROUTES
+access-list 10 permit 192.168.0.0 0.0.0.255
+access-list 10 permit 192.168.2.0 0.0.0.255
+access-list 10 permit 192.168.4.0 0.0.0.255
+! implicit deny
+router bgp 65536
+neighbor 10.10.2.2 distribute-list 10 in
+exi
+!
+!
+! ROUTE-MAP TWEAK - INCOMING ROUTES
+!
+access-list 20 permit 192.168.2.0 0.0.0.255
+access-list 20 permit 192.168.4.0 0.0.0.255
+!
+route-map FIX-BGP-IN permit 10
+match ip address 20
+set local-preference 200
+exi
+route-map FIX-BGP-IN permit 20
+exi
+!
+router bgp 65536
+neighbor 10.10.2.2 route-map FIX-BGP-IN in
+exi
+exi
+clear ip bgp * soft in
