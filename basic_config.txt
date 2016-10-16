@@ -1,4 +1,4 @@
-! BASIC ROUTER CONFIGURATION
+! BASIC ROUTER/SWITCH CONFIGURATION
 ! - pja
 !
 ! FROM: R>
@@ -6,38 +6,61 @@
 ! basics
 ! ==============================
 enable
-clock set 00:00:00 1 Apr 2016
-conf t
+!clock set 00:00:00 1 Apr 2016
+configure terminal
+
 hostname R2
 no ip domain-lookup
-banner X Welcome to R2 X
-service password-encryption
-enable secret class
+banner motd # Welcome to R2, ...legal notification e.g. "only authorized personnel are allowed to access the device"... #
+
 ! ==============================
-! virtual terminal (telnet )security
+! PASSWORD SECURITY
+! ==============================
+service password-encryption
+security password min-length 8
+login block-for 120 attempts 3 within 60
+
+! ==============================
+! Secure priv-EXEC mode
+! ==============================
+enable secret class
+
+! ==============================
+! virtual terminal (telnet,ssh)security
 ! ==============================
 line vty 0 15
 password vspr
+exec-timeout 10
 login
 exit
+
 ! ==============================
-! console security + logging
+! secure console access + logging
 ! ==============================
 line console 0
 password cisco
+exec-timeout 10
 login
 logging synchronous
 exit
-!
+
+! ==============================
+! SVI - Switch Virtual Interface
+! ==============================
+!interface vlan 1
+! ip address 10.0.0.254 255.255.255.0
+! ip default-dateway 10.0.0.1
+! no shutdown
 
 ! ==============================
 ! SSH
 ! ==============================
-!ip domain domainname.lan
-!crypto key generate rsa
+!ip domain-name domainname.lan
+!crypto key generate rsa general-keys modulus 1024
 !username pero secret pero123
 !ip ssh version 2
 !line vty 0 15
-! transport ssh
+! transport input ssh
 ! login local
 ! end
+
