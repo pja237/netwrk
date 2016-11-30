@@ -1,0 +1,180 @@
+dnssec
+======
+
+1. sign zone
+
+2. deploy via GPO
+	Computer Configuration\Policies\Windows Settings\Name Resolution Policy
+	- Suffix
+	- Require DNS clients to check that name and address data has been validated by the DNS server 
+	- Create
+
+iscsi
+=====
+
+	@Initiator:
+	- get IQN
+	@Target:
+	- prepare disks
+		>diskpart
+		DISKPART> list disk
+		DISKPART> select disk=1
+		DISKPART> online disk
+		DISKPART> attributes disk clear readonly
+		DISKPART> convert dynamic
+		... repeat for other disks
+		DISKPART> create volume raid disk=1,2,3
+		DISKPART> list volume
+		DISKPART> format fs=ntfs quick label=RAID5
+		DISKPART> assign letter=e
+	- setup data storage
+	- server manager-> add roles and features
+		File and Storage Services-> File and iSCSI Services
+			role: iSCSI Target Server
+		feature: Multipath I/O
+	- server manager-> file and storage services->iscsi->new iscsi target
+	@Initiator:
+		iSCSI Initiator
+
+Storage Spaces
+==============
+
+	Server Manager-> File and Storage Services-> Storage Pools
+		Physical Disks-> Tasks-> New Storage Pool
+		Virtual Disks-> Tasks-> New Virtual Disk
+			(Create a volume when wizard closes)
+
+	Deduplikacija
+	-------------
+	Server Manager-> Manage-> Add Roles and Features
+		File and Storage Services-> File and iSCSI Services-> Data Deduplication
+	Restart Server
+	Post restart-> data dedup. option available on creating new volumes or:
+	Server Manager-> File and Storage Services-> Volumes /manually per volume
+
+
+NLB
+===
+
+	Web Servers:
+	- add roles:
+		IIS -> feature: Network load balancing
+		[ add Security: windows authentication ]
+	- edit default site, change "Basic config" physical location
+	- edit default site, disable anonymous authentication, enable windows auth
+	- edit windows auth-> providers, move NTLM to 1st position on list
+	
+	NLBalancer:
+	- nlb manager:
+		New cluster
+		connect to host1 (node #1)->select lan interface
+		cluster ip configuration->add ip
+		cluster parameters-> set full internet name, change operation->multicast
+		port rules->remove current->add->:80, add->:443
+	- nlb manager:
+		Add host to cluster, repeat for host2 (node #2)
+
+
+DAC
+===
+
+	@FS - add role:
+		File and Storage Services-> File and iSCSI Services-> File Server Resource Manager
+
+	@DC- add support for DAC claims via GPO
+		@Group Policy Management
+		EDIT: Domain Controllers->Default Domain Controllers Policy
+		Computer Configuration-> Policies-> Administrative Templates-> System-> KDC
+		EDIT: KDC support for claims, compound authentication and Kerberos armoring
+			- Enabled+Always provide claims
+		@CMD-Admin: gpupdate /force
+
+	@FS - DAC preparations
+	- CREATE CLAIM TYPES
+		@Active Directory Administrative Center
+		Dynamic Access Control->Claim Types->New
+		- select source attribute: e.g. department
+		- set for user+computer
+		- Nx set The following values are suggested->Add->value1..N (e.g. prodaja, uprava)
+	- ENABLE SUPPORT for: claim source attribute & Confidentialiy
+		Dynamic Access Control->Resource Properties
+			Department->Enable
+			Confidentialiy->Enable
+			Deprtment->Add Suggested Values: attribute_value_of_interest (e.g. uprava)
+
+	@FS - setting file confidentiality
+		@File server resource manager
+		Classification Management-> Classification Properties->Refresh
+		Classification Management-> Classification Rules-> Create Classification Rule
+			Name
+			Scope->Add->Folder
+			Classification->
+				Classification method: Content Classifier
+				Property: Confidentiality
+				Value: High
+				Parameters->Configure->set regexp for content classifier (word from file)
+			Evaluation Type->Re-evaluate existing property values->Overwrite the existing value
+		File Server Resource Manager->Run Classification With All Rules Now
+		[ File Server Resource Manager->Configure Classification Schedule ]
+
+	@FS - create DAC Central Access Rules
+		@Active Directory Administrative Center
+		Dynamic Access Control->Central Access Rules->New
+			Name
+			Target Resources-> Edit-> Add a condition
+			Use following permissions as current permissions-> Edit
+			Add principal->Authenticated users + Set Condition
+				(e.g. User-Odjel-Equals-Resource-Department)
+
+	@FS - create DAC Central Access Policies
+		@Active Directory Administrative Center
+		Dynamic Access Control->Central Access Policies->New
+			Add->created rules from step before
+
+	@DC- deploy @domain level
+		@Group Policy Management
+			New GPO->Edit
+			Computer Configuration-> Policies-> Windows Settings-> Security Settings-> File System
+			Manage Central Access Policies
+
+	@FS - deploy @FS level
+		@Windows Explorer->select folder->properties->security->advanced->central policy->change
+		Select policy & apply
+
+Work folders
+============
+
+	@FS
+	- add role:
+		File and Storage Services-> File and iSCSI Services-> File Server Resource Manager-> Work Folders
+
+	- create self-signed cert for iis @powershell:
+	New-SelfSignedCertificate –DnsName „Serverdc.racunarstvo.edu“ –CertStoreLocation Cert:Localmachine\My
+		!!! COPY THUMBPRINT TO NOTEPAD !!!
+
+	- export cert to file @powershell:
+	$cert= Get-Childitem –Path cert:\LocalMachine\My\THUMBPRINT
+	Export-Certificate –Cert $cert –Filepath C:\Sharedc\Serverdc.p7b –Type P7B
+
+	- deploy cert to clients using work folders via GPO
+	netsh http add sslcert ipport=0.0.0.0:443 certhash=THUMBPRINT appid={CE66697B-3AA0-49D1-BDBD-A25C8359FD5D} certstorename=MY
+	...or add binding & ssl cert via IIS management gui
+
+	@FS - configure work spaces
+	Server Manager->File and Storage Services-> Work Folders->New Sync Share
+
+
+	@AD - deploy via GPO
+	Group Policy Management
+		User Configuration-> Policies-> Administrative Templates-> Windows Components-> Work Folders
+		EDIT: Specify Work Folders settings
+			Enabled
+			Url: https://server.url
+			+Force automatic setup
+		Computer Configuration-> Policies-> Windows Settings-> Security Settings-> Public Key Policies
+		IMPORT: Trusted Root Certification Authorities
+			server.p7b
+
+
+
+

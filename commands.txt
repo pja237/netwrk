@@ -1,0 +1,25 @@
+! ================================================================================
+! DEBUGGING/INFORMATION
+! ================================================================================
+
+S1# show interfaces iface-id
+S1# show ip iface-id
+
+S1# show mac-address-table
+S1# show mac address-table
+
+S1# show startup-config|running-config
+S1# show flash
+S1# show history
+S1# show version
+
+
+! ================================================================================
+! SWITCH
+! ================================================================================
+!   - BOOT procedure:
+!        - find IOS image
+!           - BOOT env.
+!           - recursive, depth-first search through flash
+
+show bootvar ! boot in older IOS

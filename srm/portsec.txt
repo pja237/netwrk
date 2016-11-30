@@ -1,11 +1,33 @@
+! ================================================================================
+! PORT SECURITY
+! ================================================================================
+
 interface FastEthernet0/1
  switchport mode access
  switchport port-security
- switchport port-security maximum 2
+ switchport port-security maximum 2 ! default: 1
+!--------------------------------------------------------------------------------
+!   Violation modes:
+!
+!   Protect     - drop+nothing else
+!   Restrict    - drop+syslog+counter
+! D:Shutdown    - counter+shutdown (ERROR-DISABLED)
+!--------------------------------------------------------------------------------
  switchport port-security violation shutdown
- switchport port-security mac-address sticky 
- switchport port-security mac-address sticky 000C.8513.4401
- switchport port-security mac-address sticky 0060.478C.090E
+!--------------------------------------------------------------------------------
+!
+!   address types:
+!       - static secure
+!       - dynamic secure
+!       - sticky secure (converts all previous dynamic to sticky)
+!--------------------------------------------------------------------------------
+!   static 
+! switchport port-security mac-address 000C.8513.4401
+!   dynamic sticky: 
+! switchport port-security mac-address sticky 
+!   or predefined sticky:
+! switchport port-security mac-address sticky 000C.8513.4401
+! switchport port-security mac-address sticky 0060.478C.090E
 
 ! err-disabled recovery
 conf t
@@ -17,7 +39,9 @@ end
 show errdisable recovery
 
 !----------------------------------------
-! DEBUG
+! DEBUG / VERIFY
 !----------------------------------------
 show port-security
 show port-security interface fa 0/1
+!show interface fa 0/1 status
+show port-security address

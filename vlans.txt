@@ -1,0 +1,67 @@
+! ==============================
+! VLANs
+! (config)#
+! ==============================
+!  1. CREATE
+! ==============================
+vlan vlan_id
+    name vlan_name
+    exi
+! ==============================
+!  2. ASSIGN PORTS
+! ==============================
+interface [range] if_id
+    switchport mode access
+    switchport access vlan_id 
+    exi
+! ==============================
+!  3. DELETE
+!   warning: remove ports from vlan first 
+!   (they're not reassigned to active vlans automatically)
+! ==============================
+no vlan vlan_id
+! OR: 
+! delete flash://vlan.dat
+! ==============================
+!  4. TRUNKS
+! ==============================
+interface iface_id
+    switchport mode trunk ! STARTS DTP 
+    ! switchport mode dynamic auto ! if (other_side==same|access) access;
+    ! switchport mode dynamic desirable ! if (other_side==access) access;
+    switchport nonegotiate ! disable DTP frame generation on port
+    switchport trunk native vlan vlan_id
+    switchport trunk allowed vlan vlan_list
+    exi
+! show interfaces trunk
+! ==============================
+!  5. PVLAN Edge
+!   - no traffic between protected ports on same switch
+! ==============================
+interface iface_id
+    switchport protected
+    exi
+
+! ==============================
+!  Inter-VLAN Routing
+!   Router-on-a-stick
+! ==============================
+! 1. configure switch-router link as trunk
+! 2. configure subinterfaces on the router
+!
+interface gi0/0.10 ! .N configurable, tipically same as VLAN id
+ encapsulation dot1q 10 ! VLAN id
+ ip addr 10.10.10.1 255.255.255.0
+ exi
+interface gi0/0
+ no shut
+!
+! DEBUG:
+show vlan
+
+! ==============================
+!  ROUTED PORTS 
+!   Pure L3 switch ports acting as regular router ports
+! ==============================
+interface gi0/15
+ no switchport

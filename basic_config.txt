@@ -1,6 +1,17 @@
 ! BASIC ROUTER/SWITCH CONFIGURATION
 ! - pja
 !
+! | section
+! | include
+! | exclude
+! | begin
+!
+! Ctrl-P | N (history buffer)
+! show history
+! terminal history size N ! number of commands to remember
+!
+! terminal length N ! N==nuber of lines to show before --more--
+!
 ! FROM: R>
 ! ==============================
 ! basics
@@ -10,8 +21,18 @@ enable
 configure terminal
 
 hostname R2
+no cdp run
 no ip domain-lookup
 banner motd # Welcome to R2, ...legal notification e.g. "only authorized personnel are allowed to access the device"... #
+
+! ==============================
+! NTP
+! (config)#
+! ==============================
+ntp master X ! X=stratum {1..15}, default: 8
+ntp server ntp_server_ip
+! show ntp associations
+! show ntp status
 
 ! ==============================
 ! PASSWORD SECURITY
@@ -47,20 +68,49 @@ exit
 ! ==============================
 ! SVI - Switch Virtual Interface
 ! ==============================
-!interface vlan 1
-! ip address 10.0.0.254 255.255.255.0
-! ip default-dateway 10.0.0.1
-! no shutdown
+interface vlan 99
+ description Mgmt. iface
+ ip address 10.0.0.254 255.255.255.0
+ no shutdown
+ exi
+
+ip default-dateway 10.0.0.1
+
+vlan 99
+ name mgmgt_vlan
+ exi
+
+interface iface
+ switchport access vlan 99
+ exi
+
+! ==============================
+! Configuring switch ports
+! ==============================
+! (conf)#
+interface fa 0/0
+! duplex full
+! speed 100
+!
+! Medium-Dependent Interface Crossover
+ mdix auto  ! SPEED & DUPLEX must be set to AUTO
+ exi
+! show controllers ethernet-controller fa 0/0 phy |include Auto-MDIX
 
 ! ==============================
 ! SSH
 ! ==============================
-!ip domain-name domainname.lan
-!crypto key generate rsa general-keys modulus 1024
-!username pero secret pero123
-!ip ssh version 2
-!line vty 0 15
-! transport input ssh
-! login local
-! end
+! IOS filename has "K9" - cryptographic support
+show version 
+! verify ssh support
+show ip ssh 
+!
+ip domain-name domainname.lan
+crypto key generate rsa [general-keys modulus 1024]
+username pero privilege 15 secret pero123 ! priv:0-15, 15==max
+ip ssh version 2
+line vty 0 15
+ transport input ssh
+ login local
+ end
 

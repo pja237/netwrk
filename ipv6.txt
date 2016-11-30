@@ -4,17 +4,33 @@
 ena
 conf t
 
+! Turns on ICMPv6 Router Advertisement msgs 
 ipv6 unicast-routing
 
 !-------------------------------------------------------------------------------- 
 ! ipv6 address configuration example
 !-------------------------------------------------------------------------------- 
 !interface fa0/1
+!
+!  A link-local address is automatically added to an interface 
+!  whenever a global unicast address is assigned. 
+!  An IPv6 network interface is required to have a link-local address, 
+!  but not necessarily a global unicast address.
+! ipv6 enable ! automatically creates ipv6 link-local even if no global-unicast is configured
+!
 ! ipv6 address ipv6addr/prefix
-! ipv6 address fe80::1 link-local
+! ipv6 address fe80::1 link-local ! static link-local
+! exi
+
+
+!-------------------------------------------------------------------------------- 
+! default static route
+!-------------------------------------------------------------------------------- 
+ipv6 route ::/0 ipv6_next_hop iface
 
 !-------------------------------------------------------------------------------- 
 ! test
 !-------------------------------------------------------------------------------- 
 show ipv6 int bri
 show ipv6 route
+show ipv6 routers
