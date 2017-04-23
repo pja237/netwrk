@@ -35,8 +35,32 @@ router rip
  redistribute eigrp 1 metric 5 
  network 8.0.0.0
  network 172.16.0.0
-! ne saljemo updates na ovaj interface (recimo fa0/0==8.0.0.0) ALI je oglasavamo
+! ne saljemo updates na ovaj interface (recimo fa0/0==8.0.0.0) ALI je oglasavamo (stub)
 ! passive-interface fa 0/0
+!
+! When automatic summarization has been disabled, RIPv2 no longer summarizes networks to their 
+! classful address at boundary routers. 
+! RIPv2 now includes all subnets and their appropriate masks in its routing updates. 
+!
  no auto-summary
+! propagate default static route
+ default-information originate 
  exit
 !
+!----------------------------------------
+! RIPng
+!----------------------------------------
+! enble ipv6 routing (GCM: (config)#)
+ipv6 unicast-routing
+! RIPng is ENABLED on INTERFACE, NOT in router conf mode
+interface f0/0
+ ipv6 rip domain-name enable
+ exi
+! default route (GCM)
+ipv6 rip RIP-AS default-information originate
+!
+!----------------------------------------
+! DEBUG
+!----------------------------------------
+show ip protocols
+show ipv6 protocols

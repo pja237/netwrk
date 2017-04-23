@@ -8,6 +8,13 @@
 ! - participating interfaces
 ! - area
 ! - router id
+!
+!  Two routers may not form an OSPF adjacency if:
+! 
+!  The subnet masks do not match, causing the routers to be on separate networks.
+!  OSPF Hello or Dead Timers do not match.
+!  OSPF Network Types do not match.
+!  There is a missing or incorrect OSPF network command.
 ! ==============================
 ! process: 1
 ! ==============================
@@ -15,12 +22,75 @@ router ospf 1
 ! ==============================
 ! 2 interfaces, area: 10
 ! ==============================
+!   a) network network-address wildcard-mask area area-id
+!   b) network intf-ip-address 0.0.0.0 area area-id
+!
 network 10.1.1.0 0.0.0.255 area 10
+! OR same:
+!network 10.1.1.1 0.0.0.0 area 10
 network 10.2.2.0 0.0.0.255 area 10
+
+! ==============================
+! PASSIVE INTERFACE - no ospf messages
+! ==============================
+passive-interface gi0/0
+
+! or, make all passive, then select one that isn't
+passive-interface default
+no passive-interface gi0/0
+
+! ==============================
+! REFERENCE BANDWIDTH ADJUSTMENT
+! ==============================
+!auto-cost reference-bandwidth Mb/s
+
 exit
 ! ==============================
-! router id: (highest ip of loopback OR highest ip of first active if)
-! or manual: (not recommended)
-! router ospf
-! router-id ip-address
+! router id: 
+! 1- manual (recommended): router-id ip.addr
+! 2- highest loopback ip
+!   The IPv4 address of the loopback interface should be configured using a 32-bit subnet mask (255.255.255.255).
+! 3- highest physical ip
+!
+!router-id ip-address
+! ==============================
+! DEBUG
+! ==============================
+show ip protocols
+show ip ospf 
+show ip ospf interface brief
+show ip ospf neighbor
+!
+debug ip ospf ?
+debug ip ospf spf
+! ==============================
+! CLEAR (reset) OSPF
+! ==============================
+clear ip ospf process
+
+! ==============================
+! INTERFACE BANDWIDTH ADJUSTMENT
+! ==============================
+int fa0/0
+bandwidth kilobits
+
+! ==============================
+! INTERFACE COST ADJUSTMENT (better then bw adj. because router does not have to calculate cost)
+! ==============================
+int fa0/0
+ip ospf cost N
+
+! ==============================
+! OSPFv3
+! ==============================
+ipv6 unicast-routing
+! router ospf v3
+ipv6 router ospf process-id
+
+! @iface
+ipv6 ospf process-id area area-id
+
+
+
+
 
