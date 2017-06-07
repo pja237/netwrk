@@ -1,0 +1,8 @@
+!
+! Switch(config)# interface range fa0/1 – 4 {we can use the range or single interface}
+! Switch(config-if)# channel-group [1 – 6] mode [auto | desirable | on | active | passive]
+!
+! The number of channel groups is platform dependent.
+! Auto and desirable modes activate PAgP.
+! Active and passive activate LACP.
+! Mode on forces the interface to channel without PAgP or LACP.

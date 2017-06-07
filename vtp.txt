@@ -1,0 +1,26 @@
+! ==============================
+! VTP
+! - VTP server
+! - VTP client
+! - Transparent VTP
+! .VTP msgs travel over TRUNK links
+! ==============================
+!  1. SERVER
+! ==============================
+vtp mode server
+vtp domain LAB
+vtp password cisco
+vtp version 2
+vtp pruning
+! ==============================
+!  2. CLIENT
+! ==============================
+vtp mode client
+vtp domain LAB
+vtp password cisco
+! ==============================
+!  3. TRANSPARENT
+! ==============================
+vtp mode transparent
+vtp domain LAB
+vtp password cisco

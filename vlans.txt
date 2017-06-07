@@ -51,6 +51,7 @@ interface iface_id
 !
 interface gi0/0.10 ! .N configurable, tipically same as VLAN id
  encapsulation dot1q 10 ! VLAN id
+!OR:  encapsulation dot1q 10 native
  ip addr 10.10.10.1 255.255.255.0
  exi
 interface gi0/0

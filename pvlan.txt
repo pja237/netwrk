@@ -1,0 +1,66 @@
+!
+! vlan 10 (primary)----- vlan 20 (community)
+!                    \-- vlan 30 (isolated)
+!
+! fa0/24 (promisc) vlan 10 --> vlan 20,30
+!
+! fa0/1 (community) vlan 20 --> vlan 10
+! fa0/3 (community) vlan 20 --> vlan 10
+! fa0/5 (isolated) vlan 30 --> vlan 10
+! fa0/7 (isolated) vlan 30 --> vlan 10
+!
+! SW(config)#vlan 10
+! SW(config-vlan)#private-vlan primary
+! SW(config-vlan)#private-vlan association 20,30
+! SW(config-vlan)#exi
+! SW(config)#vlan 20
+! SW(config-vlan)#private vlan community
+! SW(config-vlan)#exi
+! SW(config)#vlan 30
+! SW(config-vlan)#private vlan isolated
+! SW(config-vlan)#exi
+! SW(config)#interf
+! SW(config)#interface fa 0/24
+! SW(config-if)#switchport mode private-vlan promiscouos
+! SW(config-if)#switchport private-vlan mapping 10 20,30
+! SW(config-if)#exi
+! SW(config)#interface fastEthernet0/1
+! SW(config-if)#switchport mode private-vlan host
+! SW(config-if)#switchport private-vlan host-association 10 20
+! SW(config)#interface fastEthernet0/3
+! SW(config-if)#switchport mode private-vlan host
+! SW(config-if)#switchport private-vlan host-association 10 20
+! SW(config)#interface fastEthernet0/5
+! SW(config-if)#switchport mode private-vlan host
+! SW(config-if)#switchport private-vlan host-association 10 30
+! SW(config)#interface fastEthernet0/7
+! SW(config-if)#switchport mode private-vlan host
+! SW(config-if)#switchport private-vlan host-association 10 30
+!
+vlan 10
+private-vlan primary
+private-vlan association 20,30
+exi
+vlan 20
+private vlan community
+exi
+vlan 30
+private vlan isolated
+exi
+interf
+interface fa 0/24
+switchport mode private-vlan promiscouos
+switchport private-vlan mapping 10 20,30
+exi
+interface fastEthernet0/1
+switchport mode private-vlan host
+switchport private-vlan host-association 10 20
+interface fastEthernet0/3
+switchport mode private-vlan host
+switchport private-vlan host-association 10 20
+interface fastEthernet0/5
+switchport mode private-vlan host
+switchport private-vlan host-association 10 30
+interface fastEthernet0/7
+switchport mode private-vlan host
+switchport private-vlan host-association 10 30
