@@ -47,12 +47,25 @@ no passive-interface gi0/0
 exit
 ! ==============================
 ! router id: 
+! ==============================
 ! 1- manual (recommended): router-id ip.addr
 ! 2- highest loopback ip
 !   The IPv4 address of the loopback interface should be configured using a 32-bit subnet mask (255.255.255.255).
 ! 3- highest physical ip
 !
 !router-id ip-address
+!
+! ==============================
+! auth (1. in ospf process)
+! ==============================
+!area 10 authentication message-digest
+!
+! auth (2. auth-key @ interface) e.g.
+!
+!interface gi0/0
+! ip ospf message-digest-key 10 md5 KLJUC
+!
+!
 ! ==============================
 ! DEBUG
 ! ==============================
