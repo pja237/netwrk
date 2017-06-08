@@ -53,7 +53,24 @@ exit
 !   The IPv4 address of the loopback interface should be configured using a 32-bit subnet mask (255.255.255.255).
 ! 3- highest physical ip
 !
-!router-id ip-address
+router-id ip-address
+!
+! ==============================
+! priority: 
+! ==============================
+!Router Priority
+!An 8-bit unsigned integer. When two routers attached to a
+!network both attempt to become Designated Router, the one with
+!the highest Router Priority takes precedence. A router whose
+!Router Priority is set to 0 is ineligible to become Designated
+!Router on the attached network. Advertised in Hello packets
+!sent out this interface.
+! 0<=PRIO<=255
+interface fa1/0
+ip ospf priority 255 ! @ ospf interface
+! also @ interface
+! ip ospf hello-interval 5
+! ip ospf dead-interval 5
 !
 ! ==============================
 ! auth (1. in ospf process)
@@ -65,6 +82,18 @@ exit
 !interface gi0/0
 ! ip ospf message-digest-key 10 md5 KLJUC
 !
+! ==============================
+! REDISTRIBUTION
+! ==============================
+! from EIGRP/RIP:
+! redistribute eigrp 1 [metric-type 1|2] subnets
+! redistribute rip [metric-type 1|2] subnets
+!
+! ==============================
+! SUMMARY
+! ==============================
+!router ospf 1
+! area 51 range 172.16.0.0 255.255.0.0
 !
 ! ==============================
 ! DEBUG

@@ -1,0 +1,83 @@
+================================================================================
+OSPF MESSAGE TYPES
+================================================================================
+1. Hello
+2. DBD
+3. LSR
+4. LSU
+    - LSA(s) 
+5. LSAck
+
+================================================================================
+OSPF STATES
+================================================================================
+[DOWN]
+ |
+[INIT]
+ |
+[TWO-WAY]
+ |            Hello
+------------------------
+ |            DB sync
+[ExSTART]
+ |
+<More LSAs?>--
+ |            |
+ | Yes        |
+ |            |
+[EXCHANGE]    | No
+ |            |
+ |------------
+ |
+[LOADING]
+ |
+-------------------------
+ |            Route calc.
+[FULL]
+
+================================================================================
+OSPF LSA TYPES
+================================================================================
+1. [O] - router  LSAs (every router)
+2. [O] - network LSAs (DR)
+3. [O IA] - network summary LSAs (ABR innjects routes from one area into another)
+4. [O IA] - ASBR summary LSAs (ABR injects routes to areas without ASBR)
+5. [O E1|E2] - External LSAs (external routes injected into OSPF)
+6. - multicast OSPF -
+7. [O N1|N2] - Specific to NSSA/TS-NSSA areas (exist only within, ABR translates them to T5)
+8. - BGP redistribution -
+9. - future use -
+10.- future use -
+11.- future use -
+
+================================================================================
+OSPF AREAS
+================================================================================
+0. backbone (no special config)
+    LSA T: 1,2,3,4,5
+
+1. standard (no special config)
+    LSA T: 1,2,3,4,5
+
+2. stub
+    LSA T: 1,2,3 (ABR injects default route to ext. net, next-hop: ABR)
+
+    router ospf 1
+    area 1 stub ! on all routers, no ASBR allowed within area
+
+3. totally stubby (CISCO)
+    LSA T: 1,2 (ABR injects default route to everything else, next-hop: ABR)
+
+    router ospf 1
+    area 1 stub no summary  ! on ABR, others: area 1 stub, no ASBR allowed within area
+
+4. NSSA - Not So Stubby Area
+    LSA T: 1,2,3
+    if ASBR within:
+        LSA T: 7 (within area, on ABRs T.7 get converted to T.5)
+
+    router ospf 1
+    area 1 nssa ! on all routers
+
+5. TS-NSSA - Totally Not So Stubby Area (CISCO)
+================================================================================

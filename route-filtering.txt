@@ -1,0 +1,126 @@
+!================================================================================
+! ROUTE-MAPS
+!================================================================================
+! redistribution filternig, policy-based routing, NAT, BGP...
+!
+!syntax:
+! route-map DEMO permit 10
+!             OR
+!     match X Y Z
+! AND match A
+!     set B
+! AND set C
+! route-map DEMO permit 20
+! ...
+! IMPLICIT DENY
+!
+! match community Matches a BGP community
+! match interface Matches any routes that have the next hop out of one of the interfaces specified
+! match ip address Matches any routes that have a destination network number address that is permitted by a standard or extended ACL
+! match ip next-hop Matches any routes that have a next-hop router address that is passed by one of the ACLs specified
+! match ip route-source Matches routes that have been advertised by routers and access servers at the address that is specified by the ACLs
+! match length Matches based on the layer 3 length of a packet
+! match metric Matches routes with the metric specified
+! match route-type Matches routes of the specified type
+! match tag Matches tag of a route
+!
+! set as-path Modifies an AS path for BGP routes
+! set automatic-tag Computes automatically the tag value
+! set community Sets the BGP communities attribute
+! set default interface Indicates where to output packets that pass a match clause of a route map for policy routing and have no explicit route to the destination
+! set interface Indicates where to output packets that pass a match clause of a route map for policy routing
+! set ip default next-hop Indicates where to output packets that pass a match clause of a route map for policy routing and for which the Cisco IOS software has no explicit route to a destination
+! set ip next-hop Indicates where to output packets that pass a match clause of a route map for policy routing
+! set level Indicates where to import routes for IS-IS and OSPF
+! set local-preference Specifies a BGP local preference value
+! set metric Sets the metric value for a routing protocol
+! set metric-type Sets the metric type for the destination routing protocol
+! set tag Sets tag value for destination routing protocol
+! set weight Specifies the BGP weight value
+!
+!
+! e.g.
+!
+R2(config)#access-list 20 permit 10.200.201.0 0.0.0.255
+R2(config)#access-list 20 permit 10.200.202.0 0.0.0.255
+
+R2(config)#access-list 30 permit 10.200.200.0 0.0.0.255
+R2(config)#access-list 30 permit 10.200.203.0 0.0.0.255
+
+R2(config)#do sh access-l
+Standard IP access list 20
+    10 permit 10.200.201.0, wildcard bits 0.0.0.255
+    20 permit 10.200.202.0, wildcard bits 0.0.0.255
+Standard IP access list 30
+    10 permit 10.200.200.0, wildcard bits 0.0.0.255
+    20 permit 10.200.203.0, wildcard bits 0.0.0.255
+
+R2(config)#route-map FILTER_RIP deny 10
+R2(config-route-map)#match ip address 20
+R2(config)#route-map FILTER_RIP permit 20
+R2(config-route-map)#match ip address 30 
+! in case we're passing routes through, use SET here tu fine-tune them
+R2(config-route-map)#end
+
+R2#sh route-map 
+route-map FILTER_RIP, deny, sequence 10
+  Match clauses:
+    ip address (access-lists): 20 
+  Set clauses:
+  Policy routing matches: 0 packets, 0 bytes
+route-map FILTER_RIP, permit, sequence 20
+  Match clauses:
+    ip address (access-lists): 30 
+  Set clauses:
+  Policy routing matches: 0 packets, 0 bytes
+
+R2(config)#router ospf 1
+R2(config-router)#redistribute rip metric-type 1 subnets route-map FILTER_RIP
+
+!================================================================================
+! DISTRIBUTION LISTS
+!================================================================================
+!
+! R1(config-router)# distribute-list out
+! (X) --> filter outgoing
+!
+! R1(config-router)# distribute-list in
+! (X) <-- filter incoming
+!
+! 1. set ACL
+! IN router process:
+! 2. apply distribute-list ACL in|out @ interface
+!
+! e.g.
+!
+R4(config)#access-list 50 deny 10.100.101.0 0.0.0.255 
+R4(config)#access-list 50 permit any 
+
+R4(config)#router ospf 1
+R4(config-router)#distribute-list 50 in gigabitEthernet 1/0
+
+R4#sh access-lists 
+Standard IP access list 50
+    10 deny   10.100.101.0, wildcard bits 0.0.0.255 (1 match)
+    20 permit any (2 matches)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,1 +1,1 @@
-* rm2, rmp, srm
+* CISCO configuration reminders

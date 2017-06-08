@@ -5,15 +5,43 @@ conf t
 ! EIGRP
 !----------------------------------------
 router eigrp 1
- redistribute rip metric 100000 0 255 1 1500 
-! redistribucija default rute
- redistribute static metric 100000 10 255 1 1500 
+!----------------------------------------
+! REDISTRIBUTION
+!----------------------------------------
+! R5(config-router)#redistribute ospf 1 metric ?
+!   <1-4294967295>  Bandwidth metric in Kbits per second
+! 
+! R5(config-router)#redistribute ospf 1 metric 100000 ?
+!   <0-4294967295>  EIGRP delay metric, in 10 microsecond units
+! 
+! R5(config-router)#redistribute ospf 1 metric 100000 0 ?
+!   <0-255>  EIGRP reliability metric where 255 is 100% reliable
+! 
+! R5(config-router)#redistribute ospf 1 metric 100000 0 255 ?
+!   <1-255>  EIGRP Effective bandwidth metric (Loading) where 255 is 100% loaded
+! 
+! R5(config-router)#redistribute ospf 1 metric 100000 0 255 1 ?
+!   <1-65535>  EIGRP MTU of the path 
+! 
+! R5(config-router)#redistribute ospf 1 metric 100000 0 255 1 1500 ?
+!   match      Redistribution of OSPF routes
+!   route-map  Route map reference
+!   <cr>
+!----------------------------------------
+!redistribute rip metric 100000 0 255 1 1500 
+!
+! REDISTRIBUCIJA default rute
+!redistribute static metric 100000 10 255 1 1500 
+!
  network 172.16.3.0 0.0.0.255
  network 172.16.2.0 0.0.0.255
 ! automatska sumarizacija na granicama klasa
 ! u ruting tablici postoje Null0 rute (odbacivanje paketa ako ne postoji child ultimativna ruta)
  no auto-summary
-! maximum path X ! x same-metric load balancing ruta
+!----------------------------------------
+! LOAD-BALANCING
+!----------------------------------------
+! maximum path X ! x same-metric load balancing ruta, 1=DISABLE
 ! variance 2 ! var=1 == equal cost load balance, 2 = umnozak (koliko losija metrika ulazi u load-balance)
  exit
 !----------------------------------------
@@ -24,6 +52,8 @@ router eigrp 1
 !delay B
 !ip hello-interval eigrp 1 10
 !ip hold-interval eigrp 1 60
+!
+! SUMMARY: @outgoing router
 !ip summary address eigrp 1 a.a.a.a n.n.n.n
 !----------------------------------------
 !
